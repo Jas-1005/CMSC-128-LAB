@@ -1,0 +1,82 @@
+import 'package:flutter/material.dart';
+
+class TenantLoginPage extends StatefulWidget {
+  const TenantLoginPage({super.key});
+
+  @override
+  State<TenantLoginPage> createState() => _TenantLoginPageState();
+}
+
+class _TenantLoginPageState extends State<TenantLoginPage> {
+  // Controllers to get text from input fields
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  String errorMessage = '';
+  bool _obscureText = true;
+
+  void handleLogin() {
+    final username = usernameController.text;
+    final password = passwordController.text;
+
+    // Simple login logic for now
+    if (username == 'user' && password == '1234') {
+      Navigator.pushReplacementNamed(context, '/tenant-dashboard');
+    } else {
+      setState(() {
+        errorMessage = 'Invalid username or password';
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tenant Login')),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              controller: usernameController,
+              decoration: const InputDecoration(
+                labelText: 'Username',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: passwordController,
+              obscureText: _obscureText, // hides password input
+              decoration: InputDecoration(
+                labelText: 'Password',
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscureText ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscureText = !_obscureText; // toggle visibility
+                    });
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: handleLogin,
+              child: const Text('Login'),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              errorMessage,
+              style: const TextStyle(color: Colors.red),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
