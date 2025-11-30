@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class ManagerLoginPage extends StatefulWidget {
@@ -16,16 +18,26 @@ class _ManagerLoginPageState extends State<ManagerLoginPage> {
   bool _obscureText = true;
 
   void handleLogin() {
-    final username = usernameController.text;
-    final password = passwordController.text;
+    final email = usernameController.text.trim();
+    final password = passwordController.text.trim();
+
+
 
     // Simple login logic for now
-    if (username == 'admin' && password == '1234') {
-      Navigator.pushReplacementNamed(context, '/manager-dashboard');
-    } else {
+    if (email.isEmpty || password.isEmpty) {
+      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please complete all fields.")));
       setState(() {
-        errorMessage = 'Invalid username or password';
+        errorMessage = 'Invalid email or password';
       });
+    } else {
+      try {
+        FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password:password).then((value){
+          Navigator.pushReplacementNamed(context, '/manager-dashboard');
+        });
+      } catch(err){
+        print(err);
+      }
+
     }
   }
 
