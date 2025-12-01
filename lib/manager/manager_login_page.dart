@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 
 class ManagerLoginPage extends StatefulWidget {
   const ManagerLoginPage({super.key});
@@ -11,14 +12,14 @@ class ManagerLoginPage extends StatefulWidget {
 
 class _ManagerLoginPageState extends State<ManagerLoginPage> {
   // Controllers to get text from input fields
-  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   String errorMessage = '';
   bool _obscureText = true;
 
   void handleLogin() {
-    final email = usernameController.text.trim();
+    final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
 
@@ -27,7 +28,7 @@ class _ManagerLoginPageState extends State<ManagerLoginPage> {
     if (email.isEmpty || password.isEmpty) {
       // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please complete all fields.")));
       setState(() {
-        errorMessage = 'Invalid email or password';
+        errorMessage = 'Invalid manager email or password';
       });
     } else {
       try {
@@ -51,9 +52,9 @@ class _ManagerLoginPageState extends State<ManagerLoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
-              controller: usernameController,
+              controller: emailController,
               decoration: const InputDecoration(
-                labelText: 'Username',
+                labelText: 'Email',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -79,9 +80,29 @@ class _ManagerLoginPageState extends State<ManagerLoginPage> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: handleLogin,
-              child: const Text('Login'),
+              child: const Text('LOG IN'),
             ),
             const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 10,
+              children: [
+                const Text("Don't have an account yet?"),
+                InkWell(
+                    onTap: (){
+                      Navigator.pushReplacementNamed(context, '/manager-signup');
+                    },
+
+                    child: const Text(
+                        "Sign up here",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                        )
+                    )
+                ),
+              ],
+            ),
             Text(
               errorMessage,
               style: const TextStyle(color: Colors.red),

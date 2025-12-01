@@ -1,63 +1,68 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
 
-
-class TenantLoginPage extends StatefulWidget {
-  const TenantLoginPage({super.key});
+class ManagerSignupPage extends StatefulWidget {
+  const ManagerSignupPage({super.key});
 
   @override
-  State<TenantLoginPage> createState() => _TenantLoginPageState();
+  State<ManagerSignupPage> createState() => _ManagerSignupPageState();
 }
 
-class _TenantLoginPageState extends State<TenantLoginPage> {
+class _ManagerSignupPageState extends State<ManagerSignupPage> {
   // Controllers to get text from input fields
+  final TextEditingController fullNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController boardingHouseNameController = TextEditingController();
+  final TextEditingController contactNumberController = TextEditingController();
+
 
   String errorMessage = '';
   bool _obscureText = true;
 
-  void handleLogin() {
-    final email = emailController.text;
-    final password = passwordController.text;
+  void handleSignup() {
+    final fullName = fullNameController.text.trim();
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final boardingHouseName = boardingHouseNameController.text.trim();
+    final contactNumber = contactNumberController.text.trim();
 
-    // Simple login logic for now
-    // Simple login logic for now
-    if (email.isEmpty || password.isEmpty) {
+    // Simple signup logic for now
+    if (fullName.isEmpty || email.isEmpty || password.isEmpty || boardingHouseName.isEmpty || contactNumber.isEmpty) {
       // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please complete all fields.")));
       setState(() {
-        errorMessage = 'Invalid tenant email or password';
+        errorMessage = 'Please complete all fields';
       });
     } else {
       try {
-        FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password:password).then((value){
-          Navigator.pushReplacementNamed(context, '/tenant-dashboard');
+        FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password:password).then((value){
+          Navigator.pushReplacementNamed(context, '/manager-dashboard');
         });
       } catch(err){
         print(err);
       }
 
     }
-    // if (username == 'user' && password == '1234') {
-    //   Navigator.pushReplacementNamed(context, '/tenant-dashboard');
-    // } else {
-    //   setState(() {
-    //     errorMessage = 'Invalid username or password';
-    //   });
-    // }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tenant Login')),
+      appBar: AppBar(title: const Text('Create Manager Account')),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            TextField(
+              controller: fullNameController,
+              decoration: const InputDecoration(
+                labelText: 'Full Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
             TextField(
               controller: emailController,
               decoration: const InputDecoration(
@@ -65,7 +70,7 @@ class _TenantLoginPageState extends State<TenantLoginPage> {
                 border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             TextField(
               controller: passwordController,
               obscureText: _obscureText, // hides password input
@@ -85,22 +90,39 @@ class _TenantLoginPageState extends State<TenantLoginPage> {
               ),
             ),
             const SizedBox(height: 20),
+            TextField(
+              controller: boardingHouseNameController,
+              decoration: const InputDecoration(
+                labelText: 'Boarding House Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: contactNumberController,
+              decoration: const InputDecoration(
+                labelText: 'Contact Number',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: handleLogin,
-              child: const Text('LOG IN'),
+              onPressed: handleSignup,
+              child: const Text('SIGN UP'),
             ),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               spacing: 10,
               children: [
-                const Text("Don't have an account yet?"),
+                const Text("Already have an account?"),
                 InkWell(
                     onTap: (){
-                      Navigator.pushReplacementNamed(context, '/tenant-signup');
+                      Navigator.pushReplacementNamed(context, '/manager-login');
                     },
+
                     child: const Text(
-                        "Sign up here",
+                        "Log in here",
                         style: TextStyle(
                           color: Colors.blue,
                           decoration: TextDecoration.underline,
