@@ -222,25 +222,36 @@ class _LoginPageState extends State<LoginPage> {
                       : Text('LOG-IN'),
                 ),
               ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                spacing: 10,
-                children: [
-                  const Text("Don't have an account yet?"),
-                  InkWell(
-                      onTap: (){
+              const SizedBox(height: 20),
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Don't have an account yet?",
+                      style: TextStyle(
+                        color: Color(0xFF8C6046),
+                        fontSize: 13,
+                      ),
+                    ),
+
+                    const SizedBox(width: 6),
+
+                    InkWell(
+                      onTap: () {
                         Navigator.pushReplacementNamed(context, '/manager-signup');
                       },
                       child: const Text(
-                          "Sign up here",
-                          style: TextStyle(
-                            color: Colors.blue,
-                            decoration: TextDecoration.underline,
-                          )
-                      )
-                  ),
-                ],
+                        "Sign up here",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 13,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 12),
               Text(
