@@ -1,3 +1,4 @@
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,7 @@ class _TenantSignupPageState extends State<TenantSignupPage> {
     super.initState();// Start listening and loading when widget initializes
   }
 
-  Future <void> _verifyBHCodeAndFetchBHCode(String tenantShareCode) async {
+  Future <bool> _verifyBHCodeAndFetchBHCode(String tenantShareCode) async {
     try {
       QuerySnapshot bHCodeQuery = await FirebaseFirestore.instance
           .collection('boardingHouses')
@@ -41,13 +42,24 @@ class _TenantSignupPageState extends State<TenantSignupPage> {
         var bHCodeSnapshot = bHCodeQuery.docs.first;
         print("Boarding house ID: ${bHCodeSnapshot.id}");
         boardingHouseID = bHCodeSnapshot.id;
+        return true;
       } else {
         print('No bh found with code: $tenantShareCode');
+        return false;
       }
     } catch (e) {
       print("Error querying Firestore: $e");
-      return null;
+      return false;
     }
+  }
+
+  Future <bool> phoneNumberExists(String phoneNumber) async {
+    final phoneNumberQuery = await FirebaseFirestore.instance
+        .collection('users')
+        .where('contactNumber', isEqualTo: phoneNumber)
+        .get();
+
+    return phoneNumberQuery.docs.isNotEmpty;
   }
 
   Future <void> handleSignup() async {
@@ -57,6 +69,19 @@ class _TenantSignupPageState extends State<TenantSignupPage> {
     setState(() => _isLoading = true);
 
     try {
+      if(!(await _verifyBHCodeAndFetchBHCode(boardingHouseCode))){
+        setState(() {
+          errorMessage = "Invalid boarding house code.";
+        });
+        return;
+      }
+
+      if(await phoneNumberExists(contactNumber)){
+        setState(() {
+          errorMessage = "Phone number already in use.";
+        });
+        return;
+      }
 
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
@@ -75,8 +100,6 @@ class _TenantSignupPageState extends State<TenantSignupPage> {
         'role': role,
         'createdAt': FieldValue.serverTimestamp(),
       });
-
-
 
       if(!mounted) return;
       Navigator.pushReplacementNamed(context, '/tenant-unconfirmed');
@@ -114,13 +137,12 @@ class _TenantSignupPageState extends State<TenantSignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tenant Signup')),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Form (
           key: _formKey,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               TextFormField(
                 decoration: const InputDecoration(
@@ -171,11 +193,19 @@ class _TenantSignupPageState extends State<TenantSignupPage> {
                 decoration: const InputDecoration(
                   labelText: 'Boarding House Code',
                   border: OutlineInputBorder(),
+                  suffixIcon: Tooltip(
+                    message: "Get your boarding house code from your BH manager ",
+                    child: Icon(Icons.help_outline),
+                  )
                 ),
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(6),   // optional: limit length
                 ],
-                onSaved: (value) => _verifyBHCodeAndFetchBHCode(value!),
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'You need a boarding house code to create an account.';
+                  return null;
+                },
+                onSaved: (value) => boardingHouseCode = value!,
               ),
               const SizedBox(height: 20),
               TextFormField(
@@ -189,7 +219,7 @@ class _TenantSignupPageState extends State<TenantSignupPage> {
                   LengthLimitingTextInputFormatter(11),   // optional: limit length
                 ],
                 validator: (value) {
-                  if (value == null || value.isEmpty) return 'You need a boarding house code to create an account';
+                  if (value == null || value.isEmpty) return 'Enter your contact number.';
                   if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
                     return 'Contact number can only contain digits';
                   }

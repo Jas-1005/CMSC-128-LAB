@@ -68,13 +68,14 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
     print("Manager is not null, UID: ${user.uid}");
 
     try {
-      final managerDoc = await FirebaseFirestore.instance
-          .collection('managers')
-          .doc(user.uid) // Use the user object passed to the function
+      final managerUserQuery = await FirebaseFirestore.instance
+          .collection('users')
+          .where(FieldPath.documentId, isEqualTo: user.uid)
+          .where('role', isEqualTo: 'manager')// Use the user object passed to the function
           .get();
 
-      if (!managerDoc.exists) {
-        print("Manager Collection Exists: NO - Document not found for UID: ${user.uid}");
+      if(managerUserQuery.docs.isEmpty){
+        print("No manager found with UID: ${user.uid}");
         setState(() {
           managerName = "Manager profile not found";
           boardingHouseName = "";
@@ -84,31 +85,32 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
         });
         return;
       }
-      print("Manager Collection Exists: YES");
 
-      final managerData = managerDoc.data()!;
+      print("Manager Collection Exists: YES");
+      final managerData = managerUserQuery.docs.first.data();
+
 
       // Corrected: Assuming boardingHouseID is a String
-      final String? bhId = managerData["boardingHouseId"] as String?;
-      print("Manager's boardingHouseId: $bhId"); // Crucial print
+      final String? boardingHouseId = managerData["boardingHouseId"] as String?;
+      print("Manager's boardingHouseId: $boardingHouseId"); // Crucial print
 
-      if (bhId != null && bhId.isNotEmpty) {
-        final bhDoc = await FirebaseFirestore.instance
+      if (boardingHouseId != null && boardingHouseId.isNotEmpty) {
+        final boardingHouseDoc = await FirebaseFirestore.instance
             .collection('boardingHouses')
-            .doc(bhId) // Corrected access
+            .doc(boardingHouseId) // Corrected access
             .get();
 
-        if (bhDoc.exists) {
-          final bhData = bhDoc.data()!;
+        if (boardingHouseDoc.exists) {
+          final boardingHouseData = boardingHouseDoc.data()!;
           setState(() {
             managerName = managerData['fullName'] as String? ?? "N/A";
-            boardingHouseName = bhData['name'] as String? ?? "N/A";
+            boardingHouseName = boardingHouseData['name'] as String? ?? "N/A";
             email = managerData['email'] as String? ?? user.email ?? "N/A";
             contactNumber = managerData['contactNumber'] as String? ?? "N/A";
-            boardingHouseCode = bhData['shareCode'] as String? ?? "N/A";
+            boardingHouseCode = boardingHouseData['shareCode'] as String? ?? "N/A";
           });
         } else {
-          print("Boarding House document not found for ID: $bhId");
+          print("Boarding House document not found for ID: $boardingHouseId");
           setState(() {
             managerName = managerData['fullName'] as String? ?? "N/A";
             boardingHouseName = "Boarding House not found";

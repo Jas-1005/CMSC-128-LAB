@@ -53,27 +53,26 @@ class _ManagerDashboardPageState extends State<ManagerDashboardPage> {
     print("Manager is not null, UID: ${user.uid}");
 
     try {
-      final managerDoc = await FirebaseFirestore.instance
-          .collection('managers')
-          .doc(user.uid) // Use the user object passed to the function
+      final managerUserQuery = await FirebaseFirestore.instance
+          .collection('users')
+          .where(FieldPath.documentId, isEqualTo: user.uid)
+          .where('role', isEqualTo: 'manager')// Use the user object passed to the function
           .get();
 
-      final managerData = managerDoc.data()!;
-
-      if (!managerDoc.exists) {
-        print("Manager Collection Exists: NO - Document not found for UID: ${user.uid}");
+      if(managerUserQuery.docs.isEmpty){
+        print("No manager found with UID: ${user.uid}");
         setState(() {
           managerName = "Manager profile not found";
         });
         return;
-      } else {
-        setState(() {
-          managerName = managerData['fullName'] as String? ?? "N/A";
-        });
       }
+
+
+      final managerData = managerUserQuery.docs.first.data();
+      setState(() {
+        managerName = managerData['fullName'] as String? ?? "N/A";
+      });
       // print("Manager Collection Exists: YES");
-
-
 
     } catch (e) {
       print("Error loading manager data: $e");

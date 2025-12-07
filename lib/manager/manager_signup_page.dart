@@ -14,6 +14,7 @@ class ManagerSignupPage extends StatefulWidget {
 
 class _ManagerSignupPageState extends State<ManagerSignupPage> {
   final _formKey = GlobalKey<FormState>();
+  final String role = 'manager';
   String fullName = '';
   String email = '';
   String password = '';
@@ -28,6 +29,34 @@ class _ManagerSignupPageState extends State<ManagerSignupPage> {
     final rand = Random();
     return List.generate(6, (_) => chars[rand.nextInt(chars.length)]).join();
   }
+  
+  Future <String> generateUniqueShareCode() async {
+    String shareCode;
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    final rand = Random();
+    
+    while(true){
+      shareCode = List.generate(6, (_) => chars[rand.nextInt(chars.length)]).join();
+      
+      final shareCodeQuery = await FirebaseFirestore.instance
+          .collection('boardingHouses')
+          .where('shareCode', isEqualTo: shareCode)
+          .get();
+
+      if(shareCodeQuery.docs.isEmpty) break;
+    }
+
+    return shareCode;
+  }
+
+  Future <bool> phoneNumberExists(String phoneNumber) async {
+    final phoneNumberQuery = await FirebaseFirestore.instance
+        .collection('users')
+        .where('contactNumber', isEqualTo: phoneNumber)
+        .get();
+
+    return phoneNumberQuery.docs.isNotEmpty;
+  }
 
   Future <void> handleSignup() async {
     if (!_formKey.currentState!.validate()) return;
@@ -36,6 +65,12 @@ class _ManagerSignupPageState extends State<ManagerSignupPage> {
     setState(() => _isLoading = true);
 
     try {
+      if(await phoneNumberExists(contactNumber)){
+        setState(() {
+          errorMessage = "Phone number already in use.";
+        });
+        return;
+      }
 
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
@@ -45,7 +80,7 @@ class _ManagerSignupPageState extends State<ManagerSignupPage> {
 
       String userID = userCredential.user!.uid;
 
-      final shareCode = generateShareCode();
+      final shareCode = await generateUniqueShareCode();
       final boardingHouse = await FirebaseFirestore.instance
           .collection('boardingHouses')
           .add({
@@ -60,6 +95,7 @@ class _ManagerSignupPageState extends State<ManagerSignupPage> {
         'boardingHouseId': boardingHouse.id,
         'contactNumber': contactNumber,
         'createdAt': FieldValue.serverTimestamp(),
+        'role': role,
       });
 
       if(!mounted) return;
@@ -98,13 +134,12 @@ class _ManagerSignupPageState extends State<ManagerSignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tenant Login')),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Form (
           key: _formKey,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               TextFormField(
                 decoration: const InputDecoration(
@@ -201,7 +236,7 @@ class _ManagerSignupPageState extends State<ManagerSignupPage> {
                   const Text("Already have an account?"),
                   InkWell(
                       onTap: (){
-                        Navigator.pushReplacementNamed(context, '/manager-login');
+                        Navigator.pushReplacementNamed(context, '/login');
                       },
                       child: const Text(
                           "Log in here",

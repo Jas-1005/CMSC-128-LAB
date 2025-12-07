@@ -21,7 +21,7 @@ class LandingPage extends StatelessWidget {
               const SizedBox(height: 20),
               ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/role');
+                    Navigator.pushNamed(context, '/signup');
                   },
                   child: const Text('GET STARTED')
               )
