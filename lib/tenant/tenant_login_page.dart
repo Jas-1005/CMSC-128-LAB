@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +18,6 @@ class _TenantLoginPageState extends State<TenantLoginPage> {
   bool _obscureText = true;
   bool _isLoading = false;
 
-
   Future <void> handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -25,13 +25,20 @@ class _TenantLoginPageState extends State<TenantLoginPage> {
     setState(() => _isLoading = true);
 
     try {
-      await FirebaseAuth.instance
+      UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
             email: email.trim(),
             password:password,
       );
 
+      String userID = userCredential.user!.uid;
+
+      DocumentSnapshot tenantDoc;
+
       if(!mounted) return;
+
+
+
 
 
       Navigator.pushReplacementNamed(context, '/tenant-dashboard');

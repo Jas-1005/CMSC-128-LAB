@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'tenant_helper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TenantDashboardPage extends StatefulWidget {
   const TenantDashboardPage({super.key});
@@ -18,6 +20,71 @@ class _TenantDashboardPageState extends State<TenantDashboardPage> {
     {'icon': Icons.notifications, 'label': 'Announcement'},
   ];
 
+  String tenantName = "";
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _listenAndLoadTenantFullName(); // Start listening and loading when widget initializes
+  }
+
+  void _listenAndLoadTenantFullName() {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+      // This listener will give you the most up-to-date user object
+      // whenever the auth state changes.
+      if (user != null) {
+        // User is signed in, proceed to load data
+        setState(() {
+          _isLoading = true; // Show loading indicator
+        });
+        await _loadTenantData(user); // Pass the user object to the loading function
+        setState(() {
+          _isLoading = false; // Hide loading indicator
+        });
+      } else {
+        // User is signed out or not logged in. Clear data and show signed out state.
+        setState(() {
+          tenantName = "Not logged in";
+          _isLoading = false;
+        });
+      }
+    });
+  }
+
+  Future<void> _loadTenantData(User user) async { // Now accepts User object
+    print("Tenant is not null, UID: ${user.uid}");
+
+    try {
+      final tenantUserQuery = await FirebaseFirestore.instance
+          .collection('users')
+          .where(FieldPath.documentId, isEqualTo: user.uid)
+          .where('role', isEqualTo: 'tenant')// Use the user object passed to the function
+          .get();
+
+      if(tenantUserQuery.docs.isEmpty){
+        print("No tenant found with UID: ${user.uid}");
+        setState(() {
+          tenantName = "Manager profile not found";
+        });
+        return;
+      }
+
+
+      final tenantData = tenantUserQuery.docs.first.data();
+      setState(() {
+        tenantName = tenantData['fullName'] as String? ?? "N/A";
+      });
+      // print("Manager Collection Exists: YES");
+
+    } catch (e) {
+      print("Error loading manager data: $e");
+      setState(() {
+        tenantName = "Error loading data";
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +96,7 @@ class _TenantDashboardPageState extends State<TenantDashboardPage> {
           children: [
             Row(
               children: [
-                Text('Hello, Tenant!')
+                Text('Hello, Tenant $tenantName!')
               ],
             ),
             Container(

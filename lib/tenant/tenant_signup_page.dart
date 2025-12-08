@@ -17,6 +17,7 @@ class _TenantSignupPageState extends State<TenantSignupPage> {
   String fullName = '';
   String email = '';
   String password = '';
+  String confirmPassword = '';
   String boardingHouseCode = '';
   String contactNumber = '';
   String errorMessage = '';
@@ -79,6 +80,13 @@ class _TenantSignupPageState extends State<TenantSignupPage> {
       if(await phoneNumberExists(contactNumber)){
         setState(() {
           errorMessage = "Phone number already in use.";
+        });
+        return;
+      }
+
+      if(password != confirmPassword){
+        setState(() {
+          errorMessage = "Passwords do not match.";
         });
         return;
       }
@@ -188,6 +196,23 @@ class _TenantSignupPageState extends State<TenantSignupPage> {
                 },
                 onSaved: (value) => password = value!,
               ),
+              const SizedBox(height: 20),
+              TextFormField(
+                obscureText: _obscureText,
+                decoration: InputDecoration(
+                  labelText: 'Confirm Password',
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility),
+                    onPressed: () => setState(() => _obscureText = !_obscureText),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Retype your password';
+                  return null;
+                },
+                onSaved: (value) => confirmPassword = value!,
+              ),
               const SizedBox(height: 10),
               TextFormField(
                 decoration: const InputDecoration(
@@ -220,8 +245,8 @@ class _TenantSignupPageState extends State<TenantSignupPage> {
                 ],
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Enter your contact number.';
-                  if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
-                    return 'Contact number can only contain digits';
+                  if (!RegExp(r'^09\d{9}$').hasMatch(value)) {
+                    return 'Please input a valid phone number';
                   }
                   return null;
                 },

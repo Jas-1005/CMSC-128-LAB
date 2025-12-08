@@ -18,6 +18,7 @@ class _ManagerSignupPageState extends State<ManagerSignupPage> {
   String fullName = '';
   String email = '';
   String password = '';
+  String confirmPassword = '';
   String boardingHouseName = '';
   String contactNumber = '';
   String errorMessage = '';
@@ -72,6 +73,13 @@ class _ManagerSignupPageState extends State<ManagerSignupPage> {
         return;
       }
 
+      if(password != confirmPassword){
+        setState(() {
+          errorMessage = "Passwords do not match.";
+        });
+        return;
+      }
+
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
         email: email.trim(),
@@ -92,7 +100,7 @@ class _ManagerSignupPageState extends State<ManagerSignupPage> {
       await FirebaseFirestore.instance.collection('users').doc(userID).set({
         'fullName': fullName,
         'email': email,
-        'boardingHouseId': boardingHouse.id,
+        'boardingHouseID': boardingHouse.id,
         'contactNumber': contactNumber,
         'createdAt': FieldValue.serverTimestamp(),
         'role': role,
@@ -185,6 +193,23 @@ class _ManagerSignupPageState extends State<ManagerSignupPage> {
                 },
                 onSaved: (value) => password = value!,
               ),
+              const SizedBox(height: 20),
+              TextFormField(
+                obscureText: _obscureText,
+                decoration: InputDecoration(
+                  labelText: 'Confirm Password',
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility),
+                    onPressed: () => setState(() => _obscureText = !_obscureText),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Retype your password';
+                  return null;
+                },
+                onSaved: (value) => confirmPassword = value!,
+              ),
               const SizedBox(height: 10),
               TextFormField(
                 decoration: const InputDecoration(
@@ -209,9 +234,9 @@ class _ManagerSignupPageState extends State<ManagerSignupPage> {
                   LengthLimitingTextInputFormatter(11),   // optional: limit length
                 ],
                 validator: (value) {
-                  if (value == null || value.isEmpty) return 'Please enter boarding house name';
-                  if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
-                    return 'Contact number can only contain digits';
+                  if (value == null || value.isEmpty) return 'Enter your contact number.';
+                  if (!RegExp(r'^09\d{9}$').hasMatch(value)) {
+                    return 'Please input a valid phone number';
                   }
                   return null;
                 },

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -23,14 +24,26 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
 
     try {
-      await FirebaseAuth.instance
+      UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
         email: email.trim(),
         password:password,
       );
 
+      final user = userCredential.user;
+
       if(!mounted) return;
-      Navigator.pushReplacementNamed(context, '/manager-dashboard');
+
+      if(!mounted) return;
+      if(await isManager(user)) {
+        Navigator.pushReplacementNamed(context, '/manager-dashboard');
+        return;
+      }
+      if(await isTenant(user)) {
+        Navigator.pushReplacementNamed(context, '/tenant-dashboard');
+        return;
+      }
+
     } on FirebaseAuthException catch (e){
       String displayMessage;
       if (e.code == 'network-request-failed'){
@@ -65,22 +78,30 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future <bool> isTenant(user) async{
+    final userIsTenantQuery = await FirebaseFirestore.instance
+        .collection('users')
+        .where(FieldPath.documentId, isEqualTo: user.uid)
+        .where('role', isEqualTo: 'tenant')
+        .get();
+    return userIsTenantQuery.docs.isNotEmpty;
+  }
+
+  Future <bool> isManager(user) async{
+    final userIsManagerQuery = await FirebaseFirestore.instance
+        .collection('users')
+        .where(FieldPath.documentId, isEqualTo: user.uid)
+        .where('role', isEqualTo: 'manager')
+        .get();
+    return userIsManagerQuery.docs.isNotEmpty;
+  }
+
+
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFBF7F0),
-      /*
-      appBar: AppBar(title: const Text(
-          'Login',
-        style: TextStyle(
-          fontSize: 24,
-          fontFamily: 'Urbanist',
-          color: Colors.black54,
-          fontWeight: FontWeight.w500,
-        ),
-      )),
-       */
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Form (
@@ -230,7 +251,7 @@ class _LoginPageState extends State<LoginPage> {
                   const Text("Don't have an account yet?"),
                   InkWell(
                       onTap: (){
-                        Navigator.pushReplacementNamed(context, '/manager-signup');
+                        Navigator.pushReplacementNamed(context, '/signup');
                       },
                       child: const Text(
                           "Sign up here",

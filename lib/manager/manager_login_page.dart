@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class ManagerLoginPage extends StatefulWidget {
@@ -23,14 +25,16 @@ class _ManagerLoginPageState extends State<ManagerLoginPage> {
     setState(() => _isLoading = true);
 
     try {
-      await FirebaseAuth.instance
+      final user = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
         email: email.trim(),
         password:password,
       );
 
       if(!mounted) return;
-      Navigator.pushReplacementNamed(context, '/manager-dashboard');
+      if(await isManager(user)) Navigator.pushReplacementNamed(context, '/manager-dashboard');
+      if(await isTenant(user)) Navigator.pushReplacementNamed(context, '/tenant-dashboard');
+
     } on FirebaseAuthException catch (e){
       String displayMessage;
       if (e.code == 'network-request-failed'){
@@ -64,6 +68,25 @@ class _ManagerLoginPageState extends State<ManagerLoginPage> {
       setState(() => _isLoading = false);
     }
   }
+
+  Future <bool> isTenant(user) async{
+     final userIsTenantQuery = await FirebaseFirestore.instance
+         .collection('users')
+         .where(FieldPath.documentId, isEqualTo: user.uid)
+         .where('role', isEqualTo: 'tenant')
+         .get();
+     return userIsTenantQuery.docs.isNotEmpty;
+  }
+
+  Future <bool> isManager(user) async{
+    final userIsManagerQuery = await FirebaseFirestore.instance
+        .collection('users')
+        .where(FieldPath.documentId, isEqualTo: user.uid)
+        .where('role', isEqualTo: 'manager')
+        .get();
+    return userIsManagerQuery.docs.isNotEmpty;
+  }
+
 
   @override
   Widget build(BuildContext context) {
