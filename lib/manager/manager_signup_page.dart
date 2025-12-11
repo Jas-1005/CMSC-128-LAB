@@ -128,13 +128,6 @@ class _ManagerSignupPageState extends State<ManagerSignupPage> {
       onSaved: (v) => password = v!,
     );
   }
-
-
-  String generateShareCode() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    final rand = Random();
-    return List.generate(6, (_) => chars[rand.nextInt(chars.length)]).join();
-  }
   
   Future <String> generateUniqueShareCode() async {
     String shareCode;

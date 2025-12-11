@@ -94,6 +94,8 @@ class _TenantSignupPageState extends State<TenantSignupPage> {
       });
 
       if(!mounted) return;
+      //make a firestore query here if tennat is confirmed by manager, if tennat confirmed, go to dashboard,
+      // if not, go to unconfirmed (do the same for login??)
       Navigator.pushReplacementNamed(context, '/tenant-dashboard');
 
     } on FirebaseAuthException catch (e){

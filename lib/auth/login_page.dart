@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -127,14 +128,26 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
 
     try {
-      await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
+      UserCredential userCredential  = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email.trim(),
         password:password,
       );
 
+      final userID = userCredential.user!.uid;
       if(!mounted) return;
-      Navigator.pushReplacementNamed(context, '/manager-dashboard');
+
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userID)
+          .get();
+
+      if (userDoc.exists){
+        var userData = userDoc.data() as Map<String, dynamic>;
+        String userRole = userData['role'];
+        Navigator.pushReplacementNamed(context, '/$userRole-dashboard');
+        return;
+      }
+
     } on FirebaseAuthException catch (e){
       String displayMessage;
       if (e.code == 'network-request-failed'){
