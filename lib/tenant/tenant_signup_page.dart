@@ -84,7 +84,7 @@ class _TenantSignupPageState extends State<TenantSignupPage> {
       String userID = userCredential.user!.uid;
 
       await FirebaseFirestore.instance.collection('users').doc(userID).set({
-        'boardingHouseID': boardingHouseID,
+        'boardingHouseId': boardingHouseID,
         'fullName': fullName,
         'email': email,
         'contactNumber': contactNumber,
