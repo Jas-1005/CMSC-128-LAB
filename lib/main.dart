@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+
 import 'package:rentahanan/auth/auth.dart';
 import 'package:rentahanan/manager/manager.dart';
 import 'package:rentahanan/tenant/tenant.dart';
+
+import 'package:rentahanan/placeholder_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +26,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const LandingPage(),
+        '/placeholder-page': (context) => const PlaceholderPage(),
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignupPage(),
         // '/manager-login': (context) => const ManagerLoginPage(),

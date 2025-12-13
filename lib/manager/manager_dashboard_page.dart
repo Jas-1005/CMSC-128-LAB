@@ -418,11 +418,11 @@ class _ManagerDashboardPageState extends State<ManagerDashboardPage> {
                         width: MediaQuery.of(context).size.width * 0.43,
                         child: DashboardButton(
                           image: 'assets/images/inputDues.png',
-                          title: "Input Dues",
+                          title: "View Reports",
                           //subtitle: "Add tenants rent dues here.",
                           onTap: () {
                             Navigator.pushNamed(
-                              context, '/manager-input-tenant-due',
+                              context, '/placeholder-page',
                               arguments: {
                               'tenantID': 'T1234',
                             },
