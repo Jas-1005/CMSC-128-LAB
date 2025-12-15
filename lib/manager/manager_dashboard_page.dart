@@ -442,7 +442,7 @@ class _ManagerDashboardPageState extends State<ManagerDashboardPage> {
                         width: MediaQuery.of(context).size.width * 0.43,
                         child: DashboardButton(
                           image: 'assets/images/dues.png',
-                          title: "View Reports",
+                          title: "Input Dues",
                           //subtitle: "Add tenants rent dues here.",
                           onTap: () {
                             Navigator.pushNamed(
@@ -462,7 +462,7 @@ class _ManagerDashboardPageState extends State<ManagerDashboardPage> {
                           title: "Transactions",
                           //subtitle: "Check all approved transactions here.",
                           onTap: () {
-                            Navigator.pushNamed(context, '/manager-transactions');
+                            Navigator.pushNamed(context, '/placeholder-page');
                           },
                         ),
                       ),
@@ -517,7 +517,7 @@ class _ManagerDashboardPageState extends State<ManagerDashboardPage> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () =>
-                            Navigator.pushNamed(context, '/announcement'),
+                            Navigator.pushNamed(context, '/placeholder-page'),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: const [

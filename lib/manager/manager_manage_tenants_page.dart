@@ -111,7 +111,7 @@ class _ManagerManageTenantsPageState extends State<ManagerManageTenantsPage> {
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(100),
-                        color: Color(0xFF9B6A44)
+                        color: Color(0xFF3A2212)
                       ),
                       child: SizedBox(
                         height: 55,
@@ -343,7 +343,7 @@ class _ManagerManageTenantsPageState extends State<ManagerManageTenantsPage> {
                         ),
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(double.infinity, 34),
-                          backgroundColor: const Color(0xFF3A2212),
+                          backgroundColor: const Color(0xFF9B6A44),
                           foregroundColor: Colors.white,
                           elevation: 10,
                           shadowColor: Colors.black54,

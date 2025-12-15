@@ -213,7 +213,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Landlady',
+                              'Manager',
                               style: TextStyle(fontSize: 12, fontFamily:'Urbanist', color: Colors.black.withOpacity(0.55)),
                             ),
                             const SizedBox(height: 2),
@@ -234,7 +234,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFD29B65),
+                      color: const Color(0xFF9B6A44),
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 6)),
@@ -277,7 +277,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                                       margin: const EdgeInsets.only(left: 8),
                                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFD29B65),
+                                        color: const Color(0xFF9B6A44),
                                         borderRadius: BorderRadius.circular(999),
                                       ),
                                       child: GestureDetector(
@@ -394,7 +394,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                         Navigator.pushReplacementNamed(context, '/');
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFCF5A4A),
+                        backgroundColor: const Color(0xFFC46855),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
