@@ -1,16 +1,29 @@
-# rentahanan
+# Rentahanan
 
-A new Flutter project.
+**Rentahanan** is a Flutter-based mobile application designed to help property managers and tenants efficiently manage dues, payments, and tenant information.
+
+---
+
+## Features
+
+- Add, view, and manage tenants
+- Track dues and payments for each tenant
+- Swipeable carousel to view past dues
+- Generate summaries of total amounts to pay and remaining balances
+
+---
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+You can download the app from this link:
 
-A few resources to get you started if this is your first Flutter project:
+[Download Rentahanan APK](https://drive.google.com/file/d/1t8bHgFoL3LDYk-pxi9IEHhWny_K9KOh2/view?usp=drive_link)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Simply install the APK on your Android device and start managing your rental properties.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## Built With
+
+- [Flutter](https://flutter.dev/)
+- [Firebase Firestore](https://firebase.google.com/docs/firestore) for backend data storage
